@@ -1,3 +1,5 @@
+using PayWall.NetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -8,7 +10,7 @@ builder.Services.AddControllersWithViews()
     });
 
 // Add PayWall Service
-builder.Services.AddPayWallService(builder.Configuration);
+builder.Services.AddPaywallService(builder.Configuration);
 
 var app = builder.Build();
 
