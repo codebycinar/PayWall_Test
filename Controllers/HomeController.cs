@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using PayWall.NetCore.Extensions;
 using PayWall.NetCore.Models.Abstraction;
 using PayWall.NetCore.Models.Request;
 using PayWall.NetCore.Models.Request.Payment;
@@ -127,6 +128,8 @@ namespace PayWallDemo.Controllers
 
         public IActionResult PaymentResult(string paymentId, string status)
         {
+            _logger.LogInformation($"PaymentResult: PaymentId={paymentId}, Status={status}");
+            
             // Handle 3D secure callback here
             if (status == "success")
             {
@@ -140,28 +143,34 @@ namespace PayWallDemo.Controllers
 
         // 3D Secure Payment Example
         [HttpPost]
-        public async Task<IActionResult> Process3DPayment(Payment3DRequest paymentRequest)
+        public async Task<IActionResult> Process3DPayment(PaymentModel model)
         {
             try
             {
                 if (!ModelState.IsValid)
                 {
-                    return View("Payment", paymentRequest);
+                    return View("Payment", model);
                 }
 
-             
-                //    Amount = model.Amount,
-                //    Currency = model.Currency,
-                //    Installment = model.Installment,
-                //    OrderId = DateTime.Now.Ticks.ToString(), // Generate a unique order ID
-                //    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
-                //    ReturnUrl = Url.Action("PaymentResult", "Home", null, Request.Scheme),
-                //    Description = "Test 3D Payment",
-                //    ClientTransactionId = Guid.NewGuid().ToString(),
-                //    OrderDescription = "Test 3D Order"
-
                 // 3D Secure Payment Request
-             
+                var paymentRequest = new Payment3DRequest
+                {
+                    ClientId = _paywallService.GetClientId(),
+                    CardHolderName = model.CardHolderName,
+                    CardNumber = model.CardNumber,
+                    ExpireMonth = model.ExpiryMonth,
+                    ExpireYear = model.ExpiryYear,
+                    Cvv = model.Cvv,
+                    Amount = model.Amount,
+                    Currency = model.Currency,
+                    Installment = model.Installment ?? 0,
+                    OrderId = DateTime.Now.Ticks.ToString(), // Generate a unique order ID
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
+                    ReturnUrl = Url.Action("PaymentResult", "Home", null, Request.Scheme),
+                    Description = "Test 3D Payment",
+                    ClientTransactionId = Guid.NewGuid().ToString(),
+                    OrderDescription = "Test 3D Order"
+                };
 
                 var response = await _paywallService.Payment.StartThreeDAsync(paymentRequest);
 
@@ -172,15 +181,15 @@ namespace PayWallDemo.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, response.Body.Message ?? "3D payment initialization failed");
-                    return View("Payment", paymentRequest);
+                    ModelState.AddModelError(string.Empty, response.Body?.Message ?? "3D payment initialization failed");
+                    return View("Payment", model);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error processing 3D payment");
-                ModelState.AddModelError(string.Empty, "An error occurred while processing your 3D secure payment.");
-                return View("Payment", paymentRequest);
+                ModelState.AddModelError(string.Empty, "An error occurred while processing your 3D secure payment: " + ex.Message);
+                return View("Payment", model);
             }
         }
     }
