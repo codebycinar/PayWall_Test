@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PayWall.NetCore.Models.Request;
+using PayWall.NetCore.Models.Response;
 using PayWall.NetCore.Services;
 using PayWallDemo.Models;
 
@@ -7,10 +8,10 @@ namespace PayWallDemo.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IPaywallService _paywallService;
+        private readonly PayWallService _paywallService;
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(IPaywallService paywallService, ILogger<HomeController> logger)
+        public HomeController(PayWallService paywallService, ILogger<HomeController> logger)
         {
             _paywallService = paywallService;
             _logger = logger;
@@ -37,7 +38,7 @@ namespace PayWallDemo.Controllers
                 }
 
                 // Direct Payment Request (2D)
-                var paymentRequest = new DirectPaymentRequest
+                var paymentRequest = new PayWallDirectPaymentRequest
                 {
                     CardHolderName = model.CardHolderName,
                     CardNumber = model.CardNumber,
@@ -50,7 +51,9 @@ namespace PayWallDemo.Controllers
                     OrderId = DateTime.Now.Ticks.ToString(), // Generate a unique order ID
                     IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
                     ReturnUrl = Url.Action("PaymentResult", "Home", null, Request.Scheme),
-                    Description = "Test Payment"
+                    Description = "Test Payment",
+                    ClientTransactionId = Guid.NewGuid().ToString(),
+                    OrderDescription = "Test Order"
                 };
 
                 var response = await _paywallService.DirectPaymentAsync(paymentRequest);
@@ -82,7 +85,7 @@ namespace PayWallDemo.Controllers
 
             try
             {
-                var binRequest = new BinLookupRequest
+                var binRequest = new PayWallBinLookupRequest
                 {
                     CardNumber = cardNumber
                 };
@@ -91,10 +94,11 @@ namespace PayWallDemo.Controllers
 
                 if (binResponse.IsSuccess)
                 {
-                    var installmentRequest = new InstallmentLookupRequest
+                    var installmentRequest = new PayWallInstallmentLookupRequest
                     {
                         CardNumber = cardNumber,
-                        Amount = 100 // Sample amount
+                        Amount = 100, // Sample amount
+                        ClientTransactionId = Guid.NewGuid().ToString()
                     };
 
                     var installmentResponse = await _paywallService.InstallmentLookupAsync(installmentRequest);
@@ -143,7 +147,7 @@ namespace PayWallDemo.Controllers
                 }
 
                 // 3D Secure Payment Request
-                var paymentRequest = new SecurePaymentRequest
+                var paymentRequest = new PayWallSecurePaymentRequest
                 {
                     CardHolderName = model.CardHolderName,
                     CardNumber = model.CardNumber,
@@ -156,7 +160,9 @@ namespace PayWallDemo.Controllers
                     OrderId = DateTime.Now.Ticks.ToString(), // Generate a unique order ID
                     IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
                     ReturnUrl = Url.Action("PaymentResult", "Home", null, Request.Scheme),
-                    Description = "Test 3D Payment"
+                    Description = "Test 3D Payment",
+                    ClientTransactionId = Guid.NewGuid().ToString(),
+                    OrderDescription = "Test 3D Order"
                 };
 
                 var response = await _paywallService.SecurePaymentAsync(paymentRequest);
