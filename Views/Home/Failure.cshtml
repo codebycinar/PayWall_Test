@@ -1,0 +1,35 @@
+@model dynamic
+
+@{
+    ViewData["Title"] = "Payment Failed";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="text-center">Payment Failed</h3>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-x-circle-fill text-danger" style="font-size: 5rem;"></i>
+                    </div>
+                    
+                    <div class="alert alert-danger">
+                        <p>Your payment could not be processed successfully.</p>
+                        @if (Model.PaymentId != null)
+                        {
+                            <p>Payment ID: @Model.PaymentId</p>
+                        }
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="@Url.Action("Payment", "Home")" class="btn btn-primary">Try Again</a>
+                        <a href="@Url.Action("Index", "Home")" class="btn btn-secondary">Back to Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
