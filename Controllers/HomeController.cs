@@ -68,7 +68,7 @@ namespace PayWallDemo.Controllers
                         {
                             Save = false,
                         },
-                        UniqueCode = Guid.NewGuid().ToString(),
+                        UniqueCode = ""
                     },
                     Customer = new Customer
                     {
@@ -102,15 +102,13 @@ namespace PayWallDemo.Controllers
                      }
                 };
 
-
                 //PayWall.NetCore.Services.PayWallService payWallService = new PayWallService()
-             
                 var response = await _paywallService.Payment.StartThreeDAsync(paymentRequest);
 
                 if (response.Result)
                 {
                     // Return the 3D Secure HTML content to redirect the user to the bank's verification page
-                    return Content(response.Body.ToString(), "text/html");
+                    return Redirect(response.Body.RedirectUrl);
                 }
                 else
                 {
