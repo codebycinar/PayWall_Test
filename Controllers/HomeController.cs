@@ -1,11 +1,6 @@
-using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using PayWall.NetCore.Extensions;
 using PayWall.NetCore.Models.Abstraction;
-using PayWall.NetCore.Models.Request;
 using PayWall.NetCore.Models.Request.Payment;
-using PayWall.NetCore.Models.Response;
 using PayWall.NetCore.Services;
 using PayWallDemo.Models;
 
@@ -68,7 +63,12 @@ namespace PayWallDemo.Controllers
                         Number = model.CardNumber,
                         ExpireMonth = model.ExpiryMonth,
                         ExpireYear = model.ExpiryYear,
-                        Cvv = model.Cvv
+                        Cvv = model.Cvv,
+                        CardSave = new CardSave
+                        {
+                            Save = false,
+                        },
+                        UniqueCode = Guid.NewGuid().ToString(),
                     },
                     Customer = new Customer
                     {
@@ -88,7 +88,9 @@ namespace PayWallDemo.Controllers
                         ClientIP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
                         CurrencyId = (short)Currency.Try,
                         MerchantFailBackUrl = Url.Action("PaymentResult", "Home", null, Request.Scheme),
-                        MerchantSuccessBackUrl = Url.Action("PaymentResult", "Home", null, Request.Scheme)
+                        MerchantSuccessBackUrl = Url.Action("PaymentResult", "Home", null, Request.Scheme),
+                        MerchantUniqueCode = Guid.NewGuid().ToString(),
+                        Installment = 1
                     },
                     Products = new List<Products>
                      {
@@ -101,18 +103,8 @@ namespace PayWallDemo.Controllers
                 };
 
 
-                PayWall.NetCore.Configuration.PayWallOptions payWallOptions = new PayWall.NetCore.Configuration.PayWallOptions()
-                {
-                    DataCenter = PayWall.NetCore.Models.Common.DataCenter.Global,
-                    PrivateClient = _config.GetSection("PayWall").GetSection("PrivateClient").Value,
-                    PrivateKey = _config.GetSection("PayWall").GetSection("PrivateKey").Value,
-                    PublicClient = _config.GetSection("PayWall").GetSection("PublicClient").Value,
-                    PublicKey = _config.GetSection("PayWall").GetSection("PublicKey").Value,
-                    Prod = false
-
-                };
-                 
-                
+                //PayWall.NetCore.Services.PayWallService payWallService = new PayWallService()
+             
                 var response = await _paywallService.Payment.StartThreeDAsync(paymentRequest);
 
                 if (response.Result)
