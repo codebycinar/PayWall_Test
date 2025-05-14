@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PayWall.NetCore.Extensions;
+using PayWall.NetCore.Models.Abstraction;
 using PayWall.NetCore.Models.Request.Payment;
 using PayWall.NetCore.Services;
 using PayWallDemo.Models;
@@ -35,25 +36,42 @@ namespace PayWallDemo.Controllers
                 // Test için örnek kart bilgileri
                 var paymentRequest = new Payment3DRequest
                 {
-                    ClientId = _paywallService.GetClientId(),
-                    CardHolderName = model.CardHolderName,
-                    CardNumber = model.CardNumber,
-                    ExpireMonth = model.ExpiryMonth,
-                    ExpireYear = model.ExpiryYear,
-                    Cvv = model.Cvv,
-                    Amount = model.Amount,
-                    Currency = model.Currency,
-                    Installment = model.Installment ?? 0,
-                    OrderId = DateTime.Now.Ticks.ToString(),
-                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
-                    ReturnUrl = Url.Action("Result", "Payment", null, Request.Scheme),
-                    Description = "Test Payment",
-                    ClientTransactionId = Guid.NewGuid().ToString(),
-                    OrderDescription = "Test Order",
-                    CustomerName = model.CardHolderName,
-                    CustomerEmail = "test@example.com",
-                    CustomerPhone = "05555555555",
-                    CustomerIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1"
+                    Card = new Card
+                    {
+                        OwnerName = model.CardHolderName,
+                        Number = model.CardNumber,
+                        ExpireMonth = model.ExpiryMonth,
+                        ExpireYear = model.ExpiryYear,
+                        Cvv = model.Cvv
+                    },
+                    Customer = new Customer
+                    {
+                        Address = "bla bla bla",
+                        City = "Istanbul",
+                        Country = "Turkey",
+                        Email = "hus.cinar@gmail.com",
+                        FullName = model.CardHolderName,
+                        IdentityNumber = "12345678901",
+                        Phone = "05555555555",
+                        TaxNumber = "1234567890",
+                    },
+                    PaymentDetail = new Payment3DRequestDetail
+                    {
+                        Amount = model.Amount,
+                        ChannelId = (int)Channel.Web,
+                        ClientIP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
+                        CurrencyId = (short)Currency.Try,
+                        MerchantFailBackUrl = Url.Action("PaymentResult", "Home", null, Request.Scheme),
+                        MerchantSuccessBackUrl = Url.Action("PaymentResult", "Home", null, Request.Scheme)
+                    },
+                    Products = new List<Products>
+                     {
+                         new Products
+                         {
+                              ProductAmount = model.Amount,
+                               ProductName = "Test Product",
+                         }
+                     }
                 };
 
                 _logger.LogInformation("3D Payment request initiating: " + System.Text.Json.JsonSerializer.Serialize(paymentRequest));

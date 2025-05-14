@@ -31,105 +31,10 @@ namespace PayWallDemo.Controllers
             return View(new PaymentModel());
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> ProcessPayment(PaymentModel model)
-        //{
-        //    try
-        //    {
-        //        if (!ModelState.IsValid)
-        //        {
-        //            return View("Payment", model);
-        //        }
-
-        //        // Direct Payment Request (2D)
-        //        var paymentRequest = new PayWallDirectPaymentRequest
-        //        {
-        //            CardHolderName = model.CardHolderName,
-        //            CardNumber = model.CardNumber,
-        //            ExpireMonth = model.ExpiryMonth,
-        //            ExpireYear = model.ExpiryYear,
-        //            Cvv = model.Cvv,
-        //            Amount = model.Amount,
-        //            Currency = model.Currency,
-        //            Installment = model.Installment,
-        //            OrderId = DateTime.Now.Ticks.ToString(), // Generate a unique order ID
-        //            IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
-        //            ReturnUrl = Url.Action("PaymentResult", "Home", null, Request.Scheme),
-        //            Description = "Test Payment",
-        //            ClientTransactionId = Guid.NewGuid().ToString(),
-        //            OrderDescription = "Test Order"
-        //        };
-
-        //        var response = await _paywallService.DirectPaymentAsync(paymentRequest);
-
-        //        if (response.IsSuccess)
-        //        {
-        //            return View("Success", response);
-        //        }
-        //        else
-        //        {
-        //            ModelState.AddModelError(string.Empty, response.ErrorMessage ?? "Payment failed");
-        //            return View("Payment", model);
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error processing payment");
-        //        ModelState.AddModelError(string.Empty, "An error occurred while processing your payment.");
-        //        return View("Payment", model);
-        //    }
-        //}
-
-        //public async Task<IActionResult> CheckInstallments(string cardNumber)
-        //{
-        //    if (string.IsNullOrEmpty(cardNumber) || cardNumber.Length < 6)
-        //    {
-        //        return Json(new { success = false, message = "Invalid card number" });
-        //    }
-
-        //    try
-        //    {
-        //        var binRequest = new PayWallBinLookupRequest
-        //        {
-        //            CardNumber = cardNumber
-        //        };
-
-        //        var binResponse = await _paywallService.BinLookupAsync(binRequest);
-
-        //        if (binResponse.IsSuccess)
-        //        {
-        //            var installmentRequest = new PayWallInstallmentLookupRequest
-        //            {
-        //                CardNumber = cardNumber,
-        //                Amount = 100, // Sample amount
-        //                ClientTransactionId = Guid.NewGuid().ToString()
-        //            };
-
-        //            var installmentResponse = await _paywallService.InstallmentLookupAsync(installmentRequest);
-
-        //            return Json(new
-        //            {
-        //                success = true,
-        //                binInfo = binResponse.Result,
-        //                installments = installmentResponse.Result
-        //            });
-        //        }
-        //        else
-        //        {
-        //            return Json(new { success = false, message = binResponse.ErrorMessage });
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error checking installments");
-        //        return Json(new { success = false, message = "An error occurred while checking installments." });
-        //    }
-        //}
-
         public IActionResult PaymentResult(string paymentId, string status)
         {
             _logger.LogInformation($"PaymentResult: PaymentId={paymentId}, Status={status}");
-            
+
             // Handle 3D secure callback here
             if (status == "success")
             {
@@ -152,24 +57,44 @@ namespace PayWallDemo.Controllers
                     return View("Payment", model);
                 }
 
-                // 3D Secure Payment Request
                 var paymentRequest = new Payment3DRequest
                 {
-                    ClientId = _paywallService.GetClientId(),
-                    CardHolderName = model.CardHolderName,
-                    CardNumber = model.CardNumber,
-                    ExpireMonth = model.ExpiryMonth,
-                    ExpireYear = model.ExpiryYear,
-                    Cvv = model.Cvv,
-                    Amount = model.Amount,
-                    Currency = model.Currency,
-                    Installment = model.Installment ?? 0,
-                    OrderId = DateTime.Now.Ticks.ToString(), // Generate a unique order ID
-                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
-                    ReturnUrl = Url.Action("PaymentResult", "Home", null, Request.Scheme),
-                    Description = "Test 3D Payment",
-                    ClientTransactionId = Guid.NewGuid().ToString(),
-                    OrderDescription = "Test 3D Order"
+                    Card = new Card
+                    {
+                        OwnerName = model.CardHolderName,
+                        Number = model.CardNumber,
+                        ExpireMonth = model.ExpiryMonth,
+                        ExpireYear = model.ExpiryYear,
+                        Cvv = model.Cvv
+                    },
+                    Customer = new Customer
+                    {
+                        Address = "bla bla bla",
+                        City = "Istanbul",
+                        Country = "Turkey",
+                        Email = "hus.cinar@gmail.com",
+                        FullName = model.CardHolderName,
+                        IdentityNumber = "12345678901",
+                        Phone = "05555555555",
+                        TaxNumber = "1234567890",
+                    },
+                    PaymentDetail = new Payment3DRequestDetail
+                    {
+                        Amount = model.Amount,
+                        ChannelId = (int)Channel.Web,
+                        ClientIP = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "127.0.0.1",
+                        CurrencyId = (short)Currency.Try,
+                        MerchantFailBackUrl = Url.Action("PaymentResult", "Home", null, Request.Scheme),
+                        MerchantSuccessBackUrl = Url.Action("PaymentResult", "Home", null, Request.Scheme)
+                    },
+                    Products = new List<Products>
+                     {
+                         new Products
+                         {
+                              ProductAmount = model.Amount,
+                               ProductName = "Test Product",
+                         }
+                     }
                 };
 
                 var response = await _paywallService.Payment.StartThreeDAsync(paymentRequest);

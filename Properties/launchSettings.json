@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "PayWallDemo": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:61848;http://localhost:61849"
+    }
+  }
+}

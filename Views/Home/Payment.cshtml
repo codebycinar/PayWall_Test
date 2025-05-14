@@ -1,296 +1,300 @@
 @model PayWallDemo.Models.PaymentModel
 
 @{
-    ViewData["Title"] = "Payment";
+	ViewData["Title"] = "Payment";
 }
 
 <div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="text-center">Payment Form</h3>
-                </div>
-                <div class="card-body">
-                    <ul class="nav nav-tabs mb-4" id="paymentTabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="direct-tab" data-bs-toggle="tab" data-bs-target="#direct" type="button" role="tab" aria-controls="direct" aria-selected="true">Direct Payment (2D)</button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="secure-tab" data-bs-toggle="tab" data-bs-target="#secure" type="button" role="tab" aria-controls="secure" aria-selected="false">3D Secure Payment</button>
-                        </li>
-                    </ul>
+	<div class="row justify-content-center">
+		<div class="col-md-8">
+			<div class="card">
+				<div class="card-header">
+					<h3 class="text-center">Payment Form</h3>
+				</div>
+				<div class="card-body">
+					<ul class="nav nav-tabs mb-4" id="paymentTabs" role="tablist">
+						<li class="nav-item" role="presentation">
+							<button class="nav-link active" id="direct-tab" data-bs-toggle="tab" data-bs-target="#direct" type="button" role="tab" aria-controls="direct" aria-selected="true">Direct Payment (2D)</button>
+						</li>
+						<li class="nav-item" role="presentation">
+							<button class="nav-link" id="secure-tab" data-bs-toggle="tab" data-bs-target="#secure" type="button" role="tab" aria-controls="secure" aria-selected="false">3D Secure Payment</button>
+						</li>
+					</ul>
 
-                    <div class="tab-content" id="paymentTabsContent">
-                        <div class="tab-pane fade show active" id="direct" role="tabpanel" aria-labelledby="direct-tab">
-                            <form asp-action="ProcessPayment" method="post" id="directPaymentForm">
-                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+					<div class="tab-content" id="paymentTabsContent">
+						<div class="tab-pane fade show active" id="direct" role="tabpanel" aria-labelledby="direct-tab">
+							<form asp-action="ProcessPayment" method="post" id="directPaymentForm">
+								<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                                <div class="mb-3">
-                                    <label asp-for="CardHolderName" class="form-label">Card Holder Name</label>
-                                    <input asp-for="CardHolderName" class="form-control" required />
-                                    <span asp-validation-for="CardHolderName" class="text-danger"></span>
-                                </div>
+								<div class="mb-3">
+									<label asp-for="CardHolderName" class="form-label">Card Holder Name</label>
+									<input asp-for="CardHolderName" class="form-control" required />
+									<span asp-validation-for="CardHolderName" class="text-danger"></span>
+								</div>
 
-                                <div class="mb-3">
-                                    <label asp-for="CardNumber" class="form-label">Card Number</label>
-                                    <input asp-for="CardNumber" class="form-control" id="cardNumber" required
-                                           pattern="[0-9]{16}" title="Please enter a valid 16-digit card number" />
-                                    <span asp-validation-for="CardNumber" class="text-danger"></span>
-                                    <div id="cardInfo" class="mt-2"></div>
-                                </div>
+								<div class="mb-3">
+									<label asp-for="CardNumber" class="form-label">Card Number</label>
+									<input asp-for="CardNumber" class="form-control" id="cardNumber" required
+										   pattern="[0-9]{16}" title="Please enter a valid 16-digit card number" />
+									<span asp-validation-for="CardNumber" class="text-danger"></span>
+									<div id="cardInfo" class="mt-2"></div>
+								</div>
 
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <label asp-for="ExpiryMonth" class="form-label">Expiry Month</label>
-                                        <select asp-for="ExpiryMonth" class="form-control" required>
-                                            <option value="">Month</option>
-                                            @for (int i = 1; i <= 12; i++)
-                                            {
-                                                <option value="@i.ToString("D2")">@i.ToString("D2")</option>
-                                            }
-                                        </select>
-                                        <span asp-validation-for="ExpiryMonth" class="text-danger"></span>
-                                    </div>
+								<div class="row">
+									<div class="col-md-4 mb-3">
+										<label asp-for="ExpiryMonth" class="form-label">Expiry Month</label>
+										<select asp-for="ExpiryMonth" class="form-control" required>
+											<option value="">Month</option>
+											@for (int i = 1; i <= 12; i++)
+											{
+												<option value="@i.ToString("D2")">@i.ToString("D2")</option>
+											}
+										</select>
+										<span asp-validation-for="ExpiryMonth" class="text-danger"></span>
+									</div>
 
-                                    <div class="col-md-4 mb-3">
-                                        <label asp-for="ExpiryYear" class="form-label">Expiry Year</label>
-                                        <select asp-for="ExpiryYear" class="form-control" required>
-                                            <option value="">Year</option>
-                                            @for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 10; i++)
-                                            {
-                                                <option value="@i.ToString().Substring(2)">@i</option>
-                                            }
-                                        </select>
-                                        <span asp-validation-for="ExpiryYear" class="text-danger"></span>
-                                    </div>
+									<div class="col-md-4 mb-3">
+										<label asp-for="ExpiryYear" class="form-label">Expiry Year</label>
+										<select asp-for="ExpiryYear" class="form-control" required>
+											<option value="">Year</option>
+											@for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 10; i++)
+											{
+												<option value="@i.ToString().Substring(2)">@i</option>
+											}
+										</select>
+										<span asp-validation-for="ExpiryYear" class="text-danger"></span>
+									</div>
 
-                                    <div class="col-md-4 mb-3">
-                                        <label asp-for="Cvv" class="form-label">CVV</label>
-                                        <input asp-for="Cvv" class="form-control" required
-                                               pattern="[0-9]{3,4}" title="Please enter a valid 3 or 4 digit CVV" />
-                                        <span asp-validation-for="Cvv" class="text-danger"></span>
-                                    </div>
-                                </div>
+									<div class="col-md-4 mb-3">
+										<label asp-for="Cvv" class="form-label">CVV</label>
+										<input asp-for="Cvv" class="form-control" required
+											   pattern="[0-9]{3,4}" title="Please enter a valid 3 or 4 digit CVV" />
+										<span asp-validation-for="Cvv" class="text-danger"></span>
+									</div>
+								</div>
 
-                                <div class="mb-3">
-                                    <label asp-for="Amount" class="form-label">Amount</label>
-                                    <input asp-for="Amount" class="form-control" required type="number" step="0.01" min="1" />
-                                    <span asp-validation-for="Amount" class="text-danger"></span>
-                                </div>
+								<div class="mb-3">
+									<label asp-for="Amount" class="form-label">Amount</label>
+									<input asp-for="Amount" class="form-control" required type="number" step="0.01" min="1" />
+									<span asp-validation-for="Amount" class="text-danger"></span>
+								</div>
 
-                                <div class="mb-3">
-                                    <label asp-for="Currency" class="form-label">Currency</label>
-                                    <select asp-for="Currency" class="form-control" required>
-                                        <option value="TRY">TRY</option>
-                                        <option value="USD">USD</option>
-                                        <option value="EUR">EUR</option>
-                                    </select>
-                                    <span asp-validation-for="Currency" class="text-danger"></span>
-                                </div>
+								<div class="mb-3">
+									<label asp-for="Currency" class="form-label">Currency</label>
+									<select asp-for="Currency" class="form-control" required>
+										<option value="TRY">TRY</option>
+										<option value="USD">USD</option>
+										<option value="EUR">EUR</option>
+									</select>
+									<span asp-validation-for="Currency" class="text-danger"></span>
+								</div>
 
-                                <div class="mb-3">
-                                    <label asp-for="Installment" class="form-label">Installment</label>
-                                    <select asp-for="Installment" class="form-control" id="installmentOptions">
-                                        <option value="">Select</option>
-                                        <option value="0">Single Payment</option>
-                                    </select>
-                                    <span asp-validation-for="Installment" class="text-danger"></span>
-                                </div>
+								<div class="mb-3">
+									<label asp-for="Installment" class="form-label">Installment</label>
+									<select asp-for="Installment" class="form-control" id="installmentOptions">
+										<option value="">Select</option>
+										<option value="0">Single Payment</option>
+									</select>
+									<span asp-validation-for="Installment" class="text-danger"></span>
+								</div>
 
-                                <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-primary">Make Payment</button>
-                                </div>
-                            </form>
-                        </div>
+								<div class="d-grid gap-2">
+									<button type="submit" class="btn btn-primary">Make Payment</button>
+								</div>
+							</form>
+						</div>
 
-                        <div class="tab-pane fade" id="secure" role="tabpanel" aria-labelledby="secure-tab">
-                            <form asp-action="Process3DPayment" method="post" id="securePaymentForm">
-                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+						<div class="tab-pane fade" id="secure" role="tabpanel" aria-labelledby="secure-tab">
+							<form asp-action="Process3DPayment" method="post" id="securePaymentForm">
+								<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                                <div class="mb-3">
-                                    <label asp-for="CardHolderName" class="form-label">Card Holder Name</label>
-                                    <input asp-for="CardHolderName" class="form-control" required value="Test User" />
-                                    <span asp-validation-for="CardHolderName" class="text-danger"></span>
-                                </div>
+								<div class="mb-3">
+									<label asp-for="CardHolderName" class="form-label">Card Holder Name</label>
+									<input asp-for="CardHolderName" class="form-control" required value="Test User" />
+									<span asp-validation-for="CardHolderName" class="text-danger"></span>
+								</div>
 
-                                <div class="mb-3">
-                                    <label asp-for="CardNumber" class="form-label">Card Number</label>
-                                    <input asp-for="CardNumber" class="form-control" id="cardNumber3D" required
-                                           pattern="[0-9]{16}" title="Please enter a valid 16-digit card number" value="4546711234567894" />
-                                    <span asp-validation-for="CardNumber" class="text-danger"></span>
-                                    <div id="cardInfo3D" class="mt-2"></div>
-                                </div>
+								<div class="mb-3">
+									<label asp-for="CardNumber" class="form-label">Card Number</label>
+									<input asp-for="CardNumber" class="form-control" id="cardNumber3D" required
+										   pattern="[0-9]{16}" title="Please enter a valid 16-digit card number" value="4546711234567894" />
+									<span asp-validation-for="CardNumber" class="text-danger"></span>
+									<div id="cardInfo3D" class="mt-2"></div>
+								</div>
 
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        <label asp-for="ExpiryMonth" class="form-label">Expiry Month</label>
-                                        <select asp-for="ExpiryMonth" class="form-control" required>
-                                            <option value="">Month</option>
-                                            @for (int i = 1; i <= 12; i++)
-                                            {
-                                                <option value="@i.ToString("D2")" @(i == 12 ? "selected" : "")>@i.ToString("D2")</option>
-                                            }
-                                        </select>
-                                        <span asp-validation-for="ExpiryMonth" class="text-danger"></span>
-                                    </div>
+								<div class="row">
+									<div class="col-md-4 mb-3">
+										<label for="ExpiryMonth" class="form-label">Expiry Month</label>
+										<select name="ExpiryMonth" id="ExpiryMonth" class="form-control" required>
+											<option value="">Month</option>
+											@for (int i = 1; i <= 12; i++)
+											{
+												string selected = (i == 12) ? "selected" : "";
+												<option value="@i.ToString("D2")">@i.ToString("D2")</option>
+											}
+										</select>
+										<span asp-validation-for="ExpiryMonth" class="text-danger"></span>
+									</div>
 
-                                    <div class="col-md-4 mb-3">
-                                        <label asp-for="ExpiryYear" class="form-label">Expiry Year</label>
-                                        <select asp-for="ExpiryYear" class="form-control" required>
-                                            <option value="">Year</option>
-                                            @for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 10; i++)
-                                            {
-                                                <option value="@i.ToString().Substring(2)" @(i == DateTime.Now.Year + 5 ? "selected" : "")>@i</option>
-                                            }
-                                        </select>
-                                        <span asp-validation-for="ExpiryYear" class="text-danger"></span>
-                                    </div>
+									<div class="col-md-4 mb-3">
+										<label for="ExpiryYear" class="form-label">Expiry Year</label>
+										<select name="ExpiryYear" id="ExpiryYear" class="form-control" required>
+											<option value="">Year</option>
+											@for (int i = DateTime.Now.Year; i <= DateTime.Now.Year + 10; i++)
+											{
+												string selected = (i == DateTime.Now.Year + 5) ? "selected" : "";
+												<option value="@i.ToString().Substring(2)">@i</option>
+											}
+										</select>
+										<span asp-validation-for="ExpiryYear" class="text-danger"></span>
+									</div>
 
-                                    <div class="col-md-4 mb-3">
-                                        <label asp-for="Cvv" class="form-label">CVV</label>
-                                        <input asp-for="Cvv" class="form-control" required
-                                               pattern="[0-9]{3,4}" title="Please enter a valid 3 or 4 digit CVV" value="000" />
-                                        <span asp-validation-for="Cvv" class="text-danger"></span>
-                                    </div>
-                                </div>
+									<div class="col-md-4 mb-3">
+										<label asp-for="Cvv" class="form-label">CVV</label>
+										<input asp-for="Cvv" class="form-control" required pattern="[0-9]{3,4}" title="Please enter a valid 3 or 4 digit CVV" />
+										<span asp-validation-for="Cvv" class="text-danger"></span>
+									</div>
+								</div>
 
-                                <div class="mb-3">
-                                    <label asp-for="Amount" class="form-label">Amount</label>
-                                    <input asp-for="Amount" class="form-control" required type="number" step="0.01" min="1" value="100.00" />
-                                    <span asp-validation-for="Amount" class="text-danger"></span>
-                                </div>
 
-                                <div class="mb-3">
-                                    <label asp-for="Currency" class="form-label">Currency</label>
-                                    <select asp-for="Currency" class="form-control" required>
-                                        <option value="TRY" selected>TRY</option>
-                                        <option value="USD">USD</option>
-                                        <option value="EUR">EUR</option>
-                                    </select>
-                                    <span asp-validation-for="Currency" class="text-danger"></span>
-                                </div>
+								<div class="mb-3">
+									<label asp-for="Amount" class="form-label">Amount</label>
+									<input asp-for="Amount" class="form-control" required type="number" step="0.01" min="1" value="100.00" />
+									<span asp-validation-for="Amount" class="text-danger"></span>
+								</div>
 
-                                <div class="mb-3">
-                                    <label asp-for="Installment" class="form-label">Installment</label>
-                                    <select asp-for="Installment" class="form-control" id="installmentOptions3D">
-                                        <option value="">Select</option>
-                                        <option value="0" selected>Single Payment</option>
-                                        <option value="2">2 Installments</option>
-                                        <option value="3">3 Installments</option>
-                                        <option value="6">6 Installments</option>
-                                    </select>
-                                    <span asp-validation-for="Installment" class="text-danger"></span>
-                                </div>
+								<div class="mb-3">
+									<label asp-for="Currency" class="form-label">Currency</label>
+									<select asp-for="Currency" class="form-control" required>
+										<option value="TRY" selected>TRY</option>
+										<option value="USD">USD</option>
+										<option value="EUR">EUR</option>
+									</select>
+									<span asp-validation-for="Currency" class="text-danger"></span>
+								</div>
 
-                                <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-primary">3D Secure Payment</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+								<div class="mb-3">
+									<label asp-for="Installment" class="form-label">Installment</label>
+									<select asp-for="Installment" class="form-control" id="installmentOptions3D">
+										<option value="">Select</option>
+										<option value="0" selected>Single Payment</option>
+										<option value="2">2 Installments</option>
+										<option value="3">3 Installments</option>
+										<option value="6">6 Installments</option>
+									</select>
+									<span asp-validation-for="Installment" class="text-danger"></span>
+								</div>
+
+								<div class="d-grid gap-2">
+									<button type="submit" class="btn btn-primary">3D Secure Payment</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
 
-    <script>
-        $(document).ready(function () {
-            // Card BIN lookup and installment options for Direct Payment
-            $('#cardNumber').on('input', function () {
-                var cardNumber = $(this).val();
-                if (cardNumber.length >= 6) {
-                    $.ajax({
-                        url: '@Url.Action("CheckInstallments", "Home")',
-                        type: 'GET',
-                        data: { cardNumber: cardNumber },
-                        success: function (response) {
-                            if (response.success) {
-                                // Display card info
-                                $('#cardInfo').html(
-                                    '<div class="alert alert-info">' +
-                                    'Card Type: ' + response.binInfo.cardType + '<br>' +
-                                    'Bank Name: ' + response.binInfo.bankName +
-                                    '</div>'
-                                );
+	<script>
+		$(document).ready(function () {
+			// Card BIN lookup and installment options for Direct Payment
+			$('#cardNumber').on('input', function () {
+				var cardNumber = $(this).val();
+				if (cardNumber.length >= 6) {
+					$.ajax({
+						url: '@Url.Action("CheckInstallments", "Home")',
+						type: 'GET',
+						data: { cardNumber: cardNumber },
+						success: function (response) {
+							if (response.success) {
+								// Display card info
+								$('#cardInfo').html(
+									'<div class="alert alert-info">' +
+									'Card Type: ' + response.binInfo.cardType + '<br>' +
+									'Bank Name: ' + response.binInfo.bankName +
+									'</div>'
+								);
 
-                                // Update installment options
-                                var installmentSelect = $('#installmentOptions');
-                                installmentSelect.empty();
-                                installmentSelect.append('<option value="">Select</option>');
-                                installmentSelect.append('<option value="0">Single Payment</option>');
+								// Update installment options
+								var installmentSelect = $('#installmentOptions');
+								installmentSelect.empty();
+								installmentSelect.append('<option value="">Select</option>');
+								installmentSelect.append('<option value="0">Single Payment</option>');
 
-                                if (response.installments && response.installments.length > 0) {
-                                    $.each(response.installments, function (i, item) {
-                                        installmentSelect.append(
-                                            '<option value="' + item.installment + '">' +
-                                            item.installment + ' Installments' +
-                                            '</option>'
-                                        );
-                                    });
-                                }
-                            } else {
-                                $('#cardInfo').html('<div class="alert alert-danger">' + response.message + '</div>');
-                            }
-                        },
-                        error: function () {
-                            $('#cardInfo').html('<div class="alert alert-danger">Error checking card information</div>');
-                        }
-                    });
-                } else {
-                    $('#cardInfo').html('');
-                }
-            });
+								if (response.installments && response.installments.length > 0) {
+									$.each(response.installments, function (i, item) {
+										installmentSelect.append(
+											'<option value="' + item.installment + '">' +
+											item.installment + ' Installments' +
+											'</option>'
+										);
+									});
+								}
+							} else {
+								$('#cardInfo').html('<div class="alert alert-danger">' + response.message + '</div>');
+							}
+						},
+						error: function () {
+							$('#cardInfo').html('<div class="alert alert-danger">Error checking card information</div>');
+						}
+					});
+				} else {
+					$('#cardInfo').html('');
+				}
+			});
 
-            // Card BIN lookup and installment options for 3D Secure Payment
-            $('#cardNumber3D').on('input', function () {
-                var cardNumber = $(this).val();
-                if (cardNumber.length >= 6) {
-                    $.ajax({
-                        url: '@Url.Action("CheckInstallments", "Home")',
-                        type: 'GET',
-                        data: { cardNumber: cardNumber },
-                        success: function (response) {
-                            if (response.success) {
-                                // Display card info
-                                $('#cardInfo3D').html(
-                                    '<div class="alert alert-info">' +
-                                    'Card Type: ' + response.binInfo.cardType + '<br>' +
-                                    'Bank Name: ' + response.binInfo.bankName +
-                                    '</div>'
-                                );
+			// Card BIN lookup and installment options for 3D Secure Payment
+			$('#cardNumber3D').on('input', function () {
+				var cardNumber = $(this).val();
+				if (cardNumber.length >= 6) {
+					$.ajax({
+						url: '@Url.Action("CheckInstallments", "Home")',
+						type: 'GET',
+						data: { cardNumber: cardNumber },
+						success: function (response) {
+							if (response.success) {
+								// Display card info
+								$('#cardInfo3D').html(
+									'<div class="alert alert-info">' +
+									'Card Type: ' + response.binInfo.cardType + '<br>' +
+									'Bank Name: ' + response.binInfo.bankName +
+									'</div>'
+								);
 
-                                // Update installment options
-                                var installmentSelect = $('#installmentOptions3D');
-                                installmentSelect.empty();
-                                installmentSelect.append('<option value="">Select</option>');
-                                installmentSelect.append('<option value="0">Single Payment</option>');
+								// Update installment options
+								var installmentSelect = $('#installmentOptions3D');
+								installmentSelect.empty();
+								installmentSelect.append('<option value="">Select</option>');
+								installmentSelect.append('<option value="0">Single Payment</option>');
 
-                                if (response.installments && response.installments.length > 0) {
-                                    $.each(response.installments, function (i, item) {
-                                        installmentSelect.append(
-                                            '<option value="' + item.installment + '">' +
-                                            item.installment + ' Installments' +
-                                            '</option>'
-                                        );
-                                    });
-                                }
-                            } else {
-                                $('#cardInfo3D').html('<div class="alert alert-danger">' + response.message + '</div>');
-                            }
-                        },
-                        error: function () {
-                            $('#cardInfo3D').html('<div class="alert alert-danger">Error checking card information</div>');
-                        }
-                    });
-                } else {
-                    $('#cardInfo3D').html('');
-                }
-            });
-        });
-    </script>
+								if (response.installments && response.installments.length > 0) {
+									$.each(response.installments, function (i, item) {
+										installmentSelect.append(
+											'<option value="' + item.installment + '">' +
+											item.installment + ' Installments' +
+											'</option>'
+										);
+									});
+								}
+							} else {
+								$('#cardInfo3D').html('<div class="alert alert-danger">' + response.message + '</div>');
+							}
+						},
+						error: function () {
+							$('#cardInfo3D').html('<div class="alert alert-danger">Error checking card information</div>');
+						}
+					});
+				} else {
+					$('#cardInfo3D').html('');
+				}
+			});
+		});
+	</script>
 }
