@@ -97,6 +97,8 @@ namespace PayWallDemo.Controllers
                      }
                 };
 
+                
+
                 var response = await _paywallService.Payment.StartThreeDAsync(paymentRequest);
 
                 if (response.Result)

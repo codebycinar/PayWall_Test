@@ -378,3 +378,4 @@ FodyWeavers.xsd
 
 # Sensitive configuration settings
 appsettings.Development.json
+appsettings.json
