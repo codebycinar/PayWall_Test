@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using PayWall.NetCore.Extensions;
 using PayWall.NetCore.Models.Abstraction;
 using PayWall.NetCore.Models.Request;
@@ -14,11 +15,13 @@ namespace PayWallDemo.Controllers
     {
         private readonly PayWallService _paywallService;
         private readonly ILogger<HomeController> _logger;
+        private readonly IConfiguration _config;
 
-        public HomeController(PayWallService paywallService, ILogger<HomeController> logger)
+        public HomeController(PayWallService paywallService, ILogger<HomeController> logger, IConfiguration config)
         {
             _paywallService = paywallService;
             _logger = logger;
+            _config = config;
         }
 
         public IActionResult Index()
@@ -97,8 +100,19 @@ namespace PayWallDemo.Controllers
                      }
                 };
 
-                
 
+                PayWall.NetCore.Configuration.PayWallOptions payWallOptions = new PayWall.NetCore.Configuration.PayWallOptions()
+                {
+                    DataCenter = PayWall.NetCore.Models.Common.DataCenter.Global,
+                    PrivateClient = _config.GetSection("PayWall").GetSection("PrivateClient").Value,
+                    PrivateKey = _config.GetSection("PayWall").GetSection("PrivateKey").Value,
+                    PublicClient = _config.GetSection("PayWall").GetSection("PublicClient").Value,
+                    PublicKey = _config.GetSection("PayWall").GetSection("PublicKey").Value,
+                    Prod = false
+
+                };
+                 
+                
                 var response = await _paywallService.Payment.StartThreeDAsync(paymentRequest);
 
                 if (response.Result)

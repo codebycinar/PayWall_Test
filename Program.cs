@@ -1,4 +1,5 @@
 using PayWall.NetCore;
+using PayWallDemo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,8 @@ builder.Services.AddControllersWithViews()
     });
 
 // Add PayWall Service
-builder.Services.AddPaywallService(builder.Configuration);
+builder.Services.AddTransient<LoggingDelegatingHandler>();
+builder.Services.AddPaywallService(builder.Configuration,sp => sp.GetRequiredService<LoggingDelegatingHandler>());
 
 var app = builder.Build();
 
